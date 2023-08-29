@@ -1,0 +1,93 @@
+﻿@model IEnumerable<DChat.Models.Message> 
+@{
+	ViewData["Title"] = "Home Page";
+	var userName = User.Identity.Name;
+}
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CodePen - WhatsApp Inspired Bootstrap Chat UI Direct Messaging App</title>
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.min.css'>
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/material-design-icons/3.0.1/iconfont/material-icons.min.css'>
+    <link rel="stylesheet" href="./css/site.css">
+
+</head>
+<body>
+
+	<div class="Jumbotron btn-light">
+		<h2 class="text-center text-primary">
+			<i class="fab fa-facebook-messsenger"></i> &nbsp; Public Talk
+		</h2>
+
+		<div class="row">
+			<div class="col-md-12" id=chat>
+				@if (Model !=null)
+				{
+					@foreach (var message in Model.OrderBy(m => m.When))
+					{
+						string containerClass, timePosition, textAlign, contcolor, offset;
+						if(userName == message.UserName)
+						{
+							containerClass = "container darker";
+							timePosition = "time-right text-light";
+							textAlign = "text-right text-white";
+							contcolor = "bg-primary";
+							offset = "col-md-6 offset-md-6";
+						}
+						else
+						{
+							containerClass = "container";
+							timePosition = "time-left";
+							textAlign = "text-left ";
+							contcolor = "bg-light";
+							offset = "";
+						}
+						<div class="row">
+							<div class="@offset">
+								<div class="@containerClass @contcolor">
+									<p class="sender @textAlign">@message.UserName</p>
+									<p class="@textAlign">@message.Text</p>
+									<span class="@timePosition">@message.When.ToString()</span>
+								</div>
+							</div>
+
+						</div>
+					}
+				}
+			</div>
+			<div class="col-md-12">
+				<form asp-action="Create" class="chat-box-tray" data-ajax-begin="clearInputField" data-ajax-complete="" data-ajax-failure="alert('Fail')" data-ajax-success="SendMessage" data-ajax="true" data-ajax-method="POST">
+					<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+					
+					<div class="form-group">
+						<input name="text" class="form-control" id="messageText" placeholder="Type your message here..." />
+					</div>
+					
+					<div class="form-group">
+						<input type="submit" value="Send" class="form-control" id="submiButton"  />
+					</div>
+					<input type="hidden" value="@userName" name="userName" />
+				</form>
+			</div>
+
+		</div>
+
+	</div>
+	@if (User.Identity.IsAuthenticated)
+	{
+		<script>
+			const userName = @ViewBag.CurrentUserName;
+		</script>
+		
+	}
+	@section scripts {
+		<script src="~/signalr/signalr.min.js"></script>
+		<script src="~/lib/jquery/dist/jquery-unobtrusive-ajax.min.js"></script>
+		<script src="~/js/signalrReqHandler.js"></script>
+		<script src="~/js/chat.js"> </script>
+	}
+</body>
+</html>
